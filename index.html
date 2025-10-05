@@ -1,1 +1,179 @@
-<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Bullet Journal</title><link rel='manifest' href='manifest.json'><link rel='stylesheet' href='style.css'></head><body><h1>Bullet Journal PWA</h1><script src='app.js'></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bullet Journal</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <header>
+    <h1>Bullet Journal</h1>
+    <div class="date-controls">
+      <input type="date" id="datePicker"/>
+      <button id="todayBtn">Today</button>
+      <button id="prevDay">◀</button>
+      <button id="nextDay">▶</button>
+
+      <select id="categoryFilter">
+        <option value="">All categories</option>
+        <option>Home</option>
+        <option>Errands</option>
+        <option>Calls</option>
+        <option>Work</option>
+        <option>Health</option>
+        <option>Personal</option>
+        <option>Other</option>
+      </select>
+
+      <select id="sortMode">
+        <option value="none">No sort</option>
+        <option value="priority">Priority first</option>
+        <option value="alpha">Alphabetical (A→Z)</option>
+        <option value="status">Status (active → completed → removed)</option>
+      </select>
+
+      <label class="toggle"><input type="checkbox" id="priorityOnly"> Priority only</label>
+
+      <button id="monthlyViewBtn">Monthly</button>
+      <button id="weeklyReviewBtn">Weekly Review</button>
+      <button id="collectionsBtn">Collections</button>
+
+      <button id="exportJSONBtn">Backup (.json)</button>
+      <button id="exportMDBtn">Export Day (.md)</button>
+      <button id="exportMonthMDBtn">Export Month (.md)</button>
+      <input type="file" id="importFile" accept=".json" style="display:none;">
+      <button id="importBtn">Restore</button>
+
+      <button id="printBtn">Print</button>
+      <button id="installBtn" class="install">Install</button>
+    </div>
+  </header>
+
+  <main id="dailyView">
+    <section class="column">
+      <h2>Tasks (☐)</h2>
+      <div class="add-row">
+        <input id="taskInput" placeholder="Add a task… (e.g., Text Laura)"/>
+        <select id="taskCategory">
+          <option>Home</option>
+          <option>Errands</option>
+          <option>Calls</option>
+          <option>Work</option>
+          <option>Health</option>
+          <option>Personal</option>
+          <option>Other</option>
+        </select>
+        <button data-type="task" class="add">Add</button>
+      </div>
+      <ul id="taskList" class="bujo-list"></ul>
+    </section>
+
+    <section class="column">
+      <h2>Events (•)</h2>
+      <div class="add-row">
+        <input id="eventInput" placeholder="Event title… (e.g., Flight)"/>
+        <input type="time" id="eventStart" title="Start time"/>
+        <input type="time" id="eventEnd" title="End time"/>
+        <select id="eventCategory">
+          <option>Home</option>
+          <option>Errands</option>
+          <option>Calls</option>
+          <option>Work</option>
+          <option>Health</option>
+          <option>Personal</option>
+          <option>Other</option>
+        </select>
+        <button data-type="event" class="add">Add</button>
+      </div>
+      <ul id="eventList" class="bujo-list"></ul>
+    </section>
+
+    <section class="column">
+      <h2>Notes (–)</h2>
+      <div class="add-row">
+        <input id="noteInput" placeholder="Add a note…"/>
+        <select id="noteCategory">
+          <option>Personal</option>
+          <option>Work</option>
+          <option>Home</option>
+          <option>Health</option>
+          <option>Other</option>
+        </select>
+        <button data-type="note" class="add">Add</button>
+      </div>
+      <ul id="noteList" class="bujo-list"></ul>
+    </section>
+  </main>
+
+  <section id="monthlyView" class="hidden">
+    <h2>Monthly Log</h2>
+    <div id="monthHeader"></div>
+    <div id="monthGrid" class="month-grid"></div>
+    <button id="closeMonthly">Close</button>
+  </section>
+
+  <section id="weeklyView" class="hidden">
+    <h2>Weekly Review</h2>
+    <div id="weekHeader"></div>
+    <div class="week-columns">
+      <div class="week-col">
+        <h3>Outstanding (not completed)</h3>
+        <ul id="weekOutstanding"></ul>
+      </div>
+      <div class="week-col">
+        <h3>Completed</h3>
+        <ul id="weekCompleted"></ul>
+      </div>
+      <div class="week-col">
+        <h3>Migrated (→)</h3>
+        <ul id="weekMigrated"></ul>
+      </div>
+    </div>
+    <div class="week-metrics">
+      <div id="metricCounts"></div>
+    </div>
+    <button id="exportWeekMdBtn">Export Week (.md)</button>
+    <button id="closeWeekly">Close</button>
+  </section>
+
+  <section id="collectionsView" class="hidden">
+    <h2>Collections</h2>
+    <div class="add-row">
+      <input id="collectionName" placeholder="New collection name (e.g., Books to Read)"/>
+      <button id="addCollection">Add Collection</button>
+    </div>
+    <div id="collectionsContainer"></div>
+    <button id="closeCollections">Close</button>
+  </section>
+
+  <template id="itemTemplate">
+    <li class="item">
+      <span class="symbol"></span>
+      <input class="text" />
+      <span class="category-pill"></span>
+      <div class="actions">
+        <button class="priority" title="Mark priority (✱)">✱</button>
+        <button class="complete" title="Complete (☑)">☑</button>
+        <button class="remove" title="Remove (✖)">✖</button>
+        <button class="migrate" title="Migrate (→)">→</button>
+      </div>
+    </li>
+  </template>
+
+  <footer>
+    <p>Symbols: ☐ task, • event, – note, ✱ priority, → migrated, ☑ completed, ✖ removed</p>
+  </footer>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js'));
+      });
+    }
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
